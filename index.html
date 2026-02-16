@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Info Finder | Exos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+        }
+        
+        body {
+            background-color: #0a0a0a;
+            color: #00ff00;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Glitch Background Effect */
+        .glitch-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #0a0a0a, #001100, #003300, #001100, #0a0a0a);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            z-index: -2;
+        }
+        
+        .glitch-bg::before,
+        .glitch-bg::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
+            mix-blend-mode: overlay;
+        }
+        
+        .glitch-bg::before {
+            background: linear-gradient(90deg, #ff0000, #00ff00, #0000ff);
+            animation: glitch-anim 3s infinite linear alternate-reverse;
+        }
+        
+        .glitch-bg::after {
+            background: linear-gradient(90deg, #0000ff, #ff0000, #00ff00);
+            animation: glitch-anim2 2s infinite linear alternate-reverse;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes glitch-anim {
+            0% { clip: rect(42px, 9999px, 44px, 0); }
+            5% { clip: rect(12px, 9999px, 59px, 0); }
+            10% { clip: rect(48px, 9999px, 29px, 0); }
+            15% { clip: rect(42px, 9999px, 73px, 0); }
+            20% { clip: rect(63px, 9999px, 27px, 0); }
+            25% { clip: rect(34px, 9999px, 55px, 0); }
+            30% { clip: rect(86px, 9999px, 73px, 0); }
+            35% { clip: rect(20px, 9999px, 20px, 0); }
+            40% { clip: rect(26px, 9999px, 60px, 0); }
+            45% { clip: rect(25px, 9999px, 66px, 0); }
+            50% { clip: rect(57px, 9999px, 98px, 0); }
+            55% { clip: rect(5px, 9999px, 46px, 0); }
+            60% { clip: rect(82px, 9999px, 31px, 0); }
+            65% { clip: rect(54px, 9999px, 27px, 0); }
+            70% { clip: rect(28px, 9999px, 99px, 0); }
+            75% { clip: rect(45px, 9999px, 69px, 0); }
+            80% { clip: rect(23px, 9999px, 85px, 0); }
+            85% { clip: rect(54px, 9999px, 84px, 0); }
+            90% { clip: rect(45px, 9999px, 47px, 0); }
+            95% { clip: rect(37px, 9999px, 20px, 0); }
+            100% { clip: rect(4px, 9999px, 91px, 0); }
+        }
+
+        @keyframes glitch-anim2 {
+            0% { clip: rect(65px, 9999px, 100px, 0); }
+            5% { clip: rect(52px, 9999px, 74px, 0); }
+            10% { clip: rect(79px, 9999px, 85px, 0); }
+            15% { clip: rect(75px, 9999px, 5px, 0); }
+            20% { clip: rect(67px, 9999px, 61px, 0); }
+            25% { clip: rect(14px, 9999px, 79px, 0); }
+            30% { clip: rect(1px, 9999px, 66px, 0); }
+            35% { clip: rect(86px, 9999px, 30px, 0); }
+            40% { clip: rect(23px, 9999px, 98px, 0); }
+            45% { clip: rect(85px, 9999px, 72px, 0); }
+            50% { clip: rect(71px, 9999px, 75px, 0); }
+            55% { clip: rect(2px, 9999px, 48px, 0); }
+            60% { clip: rect(30px, 9999px, 16px, 0); }
+            65% { clip: rect(59px, 9999px, 50px, 0); }
+            70% { clip: rect(41px, 9999px, 62px, 0); }
+            75% { clip: rect(2px, 9999px, 82px, 0); }
+            80% { clip: rect(47px, 9999px, 73px, 0); }
+            85% { clip: rect(3px, 9999px, 27px, 0); }
+            90% { clip: rect(26px, 9999px, 55px, 0); }
+            95% { clip: rect(42px, 9999px, 97px, 0); }
+            100% { clip: rect(38px, 9999px, 49px, 0); }
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+            flex: 1;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(0, 20, 0, 0.7);
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.2), transparent);
+            animation: scan 3s linear infinite;
+        }
+        
+        @keyframes scan {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px #00ff00;
+            letter-spacing: 2px;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+        
+        .search-box {
+            background: rgba(0, 20, 0, 0.7);
+            padding: 25px;
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        }
+        
+        .search-box h2 {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #00ff00;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        input {
+            flex: 1;
+            padding: 15px;
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+            font-size: 1rem;
+            background: rgba(0, 10, 0, 0.8);
+            color: #00ff00;
+            box-shadow: inset 0 0 10px rgba(0, 255, 0, 0.2);
+        }
+        
+        input::placeholder {
+            color: #008800;
+        }
+        
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+        
+        button {
+            padding: 15px 25px;
+            background: #003300;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+        }
+        
+        button:hover {
+            background: #005500;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .webview-container {
+            background: rgba(0, 20, 0, 0.7);
+            padding: 25px;
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+            display: none;
+            height: 1000px; /* Double the height */
+            overflow: hidden;
+        }
+        
+        .webview-container h2 {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #00ff00;
+        }
+        
+        #apiWebView {
+            width: 100%;
+            height: 900px; /* Double the height */
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+            background: white;
+        }
+        
+        .social-container {
+            text-align: center;
+            margin-top: auto;
+            padding: 20px 0;
+        }
+        
+        .social-title {
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            color: #00ff00;
+            text-shadow: 0 0 5px #00ff00;
+        }
+        
+        .social-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .social-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            border: 2px solid transparent;
+        }
+        
+        .social-btn:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+        
+        .telegram { background: #0088cc; }
+        .telegram:hover { border-color: #0088cc; }
+        
+        .youtube { background: #ff0000; }
+        .youtube:hover { border-color: #ff0000; }
+        
+        .instagram { 
+            background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+        }
+        .instagram:hover { border-color: #e4405f; }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loading-spinner {
+            border: 5px solid rgba(0, 255, 0, 0.3);
+            border-radius: 50%;
+            border-top: 5px solid #00ff00;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            background: rgba(80, 0, 0, 0.7);
+            padding: 15px;
+            border: 1px solid #ff0000;
+            border-radius: 5px;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 15px;
+            opacity: 0.8;
+            font-size: 0.9rem;
+            border-top: 1px solid #008800;
+            background: rgba(0, 10, 0, 0.5);
+        }
+        
+        .glitch-text {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .glitch-text::before,
+        .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .glitch-text::before {
+            left: 2px;
+            text-shadow: -2px 0 #ff00ff;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+        
+        .glitch-text::after {
+            left: -2px;
+            text-shadow: -2px 0 #00ffff;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim2 5s infinite linear alternate-reverse;
+        }
+        
+        @media (max-width: 768px) {
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .webview-container {
+                height: 600px;
+                padding: 15px;
+            }
+            
+            #apiWebView {
+                height: 500px;
+            }
+            
+            .social-buttons {
+                gap: 10px;
+            }
+            
+            .social-btn {
+                width: 45px;
+                height: 45px;
+                font-size: 1.3rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .webview-container {
+                height: 500px;
+            }
+            
+            #apiWebView {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="glitch-bg"></div>
+    
+    <div class="container">
+        <div class="header">
+            <h1 class="glitch-text" data-text="VEHICLE INFO FINDER">VEHICLE INFO FINDER</h1>
+            <p>Enter vehicle number to extract detailed information</p>
+        </div>
+        
+        <div class="search-box">
+            <h2><i class="fas fa-search"></i> SEARCH VEHICLE</h2>
+            <div class="input-group">
+                <input type="text" id="vehicleNumber" placeholder="ENTER NUMBER (Ex.UP26R4007)" value="">
+                <button id="searchBtn"><i class="fas fa-bolt"></i> GET INFO</button>
+            </div>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="loading-spinner"></div>
+            <p>LOADING VEHICLE INFORMATION...</p>
+        </div>
+        
+        <div class="error-message" id="errorMessage">
+            <p><i class="fas fa-exclamation-triangle"></i> <span id="errorText">ERROR: PLEASE ENTER A VALID VEHICLE NUMBER</span></p>
+        </div>
+        
+        <div class="webview-container" id="webviewContainer">
+            <h2><i class="fas fa-car-side"></i> VEHICLE INFORMATION</h2>
+            <iframe id="apiWebView" src="" frameborder="0"></iframe>
+        </div>
+    </div>
+
+    <div class="social-container">
+        <div class="social-title">FOLLOW ME ON SOCIAL MEDIA</div>
+        <div class="social-buttons">
+            <a href="https://t.me/CrocodileChats" target="_blank" class="social-btn telegram">
+                <i class="fab fa-telegram"></i>
+            </a>
+            <a href="https://t.me/Ruhit2" target="_blank" class="social-btn telegram">
+                <i class="fab fa-telegram-plane"></i>
+            </a>
+            <a href="https://youtube.com/@saperaitachi?si=BHRVpPp35sRlHnUF" target="_blank" class="social-btn youtube">
+                <i class="fab fa-youtube"></i>
+            </a>
+            <a href="https://www.instagram.com/Ui_OtakuVerse?igsh=ZndwZzUyYWRtYmJ3" target="_blank" class="social-btn instagram">
+                <i class="fab fa-instagram"></i>
+            </a>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>POWERED BY RUHIT X BOTS | SECURE DATA EXTRACTION SYSTEM</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchBtn = document.getElementById('searchBtn');
+            const vehicleNumberInput = document.getElementById('vehicleNumber');
+            const webviewContainer = document.getElementById('webviewContainer');
+            const apiWebView = document.getElementById('apiWebView');
+            const loading = document.getElementById('loading');
+            const errorMessage = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            
+            // Function to open API in WebView
+            function openAPIInWebView(vehicleNo) {
+                if (vehicleNo) {
+                    // Show loading
+                    loading.style.display = 'block';
+                    errorMessage.style.display = 'none';
+                    webviewContainer.style.display = 'none';
+                    
+                    // Create API URL with vehicle number
+                    const apiUrl = `https://vehicle-info-api-five.vercel.app/vehicle=${vehicleNo}`;
+                    
+                    console.log("Opening API URL:", apiUrl);
+                    
+                    // Set the iframe source to the API URL
+                    apiWebView.src = apiUrl;
+                    
+                    // Wait for iframe to load
+                    apiWebView.onload = function() {
+                        loading.style.display = 'none';
+                        webviewContainer.style.display = 'block';
+                    };
+                    
+                    apiWebView.onerror = function() {
+                        loading.style.display = 'none';
+                        errorText.textContent = 'ERROR: FAILED TO LOAD VEHICLE INFORMATION';
+                        errorMessage.style.display = 'block';
+                    };
+                    
+                } else {
+                    errorText.textContent = 'ERROR: PLEASE ENTER A VALID VEHICLE NUMBER';
+                    errorMessage.style.display = 'block';
+                }
+            }
+            
+            // Event listener for search button
+            searchBtn.addEventListener('click', function() {
+                const vehicleNo = vehicleNumberInput.value.trim();
+                openAPIInWebView(vehicleNo);
+            });
+            
+            // Allow pressing Enter to search
+            vehicleNumberInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchBtn.click();
+                }
+            });
+        });
+    </script>
+</body>
+  </html>
